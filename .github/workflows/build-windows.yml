@@ -10,26 +10,21 @@ jobs:
     defaults:
       run:
         shell: pwsh
-        working-directory: .
+        working-directory: .   # <- change to ./iracing-overlay-complete if your package.json is there
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node 20 (LTS)
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Show versions
+      - name: Show where we are + list files
         run: |
-          node -v
-          npm -v
+          Write-Host "PWD:" (Get-Location)
+          Get-ChildItem -Recurse -File | Select-Object -First 100 | ForEach-Object { $_.FullName }
 
       - name: Verify package.json exists
         run: |
-          if (!(Test-Path package.json)) {
-            throw "package.json not found at repo root. If it's in a subfolder, set defaults.run.working-directory."
-          }
+          if (-not (Test-Path package.json)) { throw "package.json not found in working-directory." }
+          node -v
+          npm -v
           node -p "require('./package.json').name"
           node -p "Object.keys(require('./package.json').scripts||{})"
 
@@ -41,26 +36,25 @@ jobs:
           npm config set cache C:\npm\cache
           $env:NPM_CONFIG_LOGLEVEL = "verbose"
 
-      # ⬇️ Key change: don't run postinstall scripts during install
-      - name: Install deps (no scripts, no optional)
+      - name: Install deps (ci if lock exists, otherwise install)
         run: |
-          npm install --ignore-scripts --omit=optional --no-audit --no-fund --loglevel=verbose `
-            || npm install --ignore-scripts --omit=optional --no-audit --no-fund --legacy-peer-deps --loglevel=verbose
-
-      # Rebuild native modules for Electron AFTER install
-      - name: Rebuild native deps for Electron
-        run: npx electron-builder install-app-deps
+          if (Test-Path package-lock.json) {
+            npm ci --no-audit --no-fund --loglevel=verbose
+          } else {
+            npm install --no-audit --no-fund --loglevel=verbose `
+              || npm install --no-audit --no-fund --legacy-peer-deps --loglevel=verbose
+          }
 
       - name: Dump npm debug log (on failure)
         if: failure()
         run: |
-          $log = Get-ChildItem -Recurse C:\npm\cache\_logs\*-debug-0.log `
-            | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+          $log = Get-ChildItem -Recurse C:\npm\cache\_logs\*-debug-0.log |
+            Sort-Object LastWriteTime -Descending | Select-Object -First 1
           if ($log) {
             "NPM LOG FILE: $($log.FullName)" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
             Get-Content $log.FullName -Raw | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
           } else {
-            "No npm log found in C:\npm\cache\_logs" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+            "No npm log found" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
           }
 
       - name: Build renderer
