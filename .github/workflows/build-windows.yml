@@ -10,7 +10,7 @@ jobs:
     defaults:
       run:
         shell: pwsh
-        working-directory: .   # <- change to ./iracing-overlay-complete if your package.json is there
+        working-directory: .
 
     steps:
       - uses: actions/checkout@v4
@@ -18,15 +18,26 @@ jobs:
       - name: Show where we are + list files
         run: |
           Write-Host "PWD:" (Get-Location)
-          Get-ChildItem -Recurse -File | Select-Object -First 100 | ForEach-Object { $_.FullName }
+          Get-ChildItem -Force
+          if (-not (Test-Path package.json)) { throw "package.json not found at repo root." }
 
-      - name: Verify package.json exists
+      - name: Setup Node 20 (LTS)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup Python for node-gyp
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Prep node-gyp (MSVC + Python)
         run: |
-          if (-not (Test-Path package.json)) { throw "package.json not found in working-directory." }
+          npm config set python "$(Get-Command python).Source"
+          npm config set msvs_version 2022
           node -v
           npm -v
-          node -p "require('./package.json').name"
-          node -p "Object.keys(require('./package.json').scripts||{})"
+          python --version
 
       - name: Configure npm
         run: |
@@ -36,7 +47,7 @@ jobs:
           npm config set cache C:\npm\cache
           $env:NPM_CONFIG_LOGLEVEL = "verbose"
 
-      - name: Install deps (ci if lock exists, otherwise install)
+      - name: Install deps (fallback if needed)
         run: |
           if (Test-Path package-lock.json) {
             npm ci --no-audit --no-fund --loglevel=verbose
