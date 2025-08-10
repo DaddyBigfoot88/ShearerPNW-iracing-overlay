@@ -10,45 +10,28 @@ jobs:
     defaults:
       run:
         shell: pwsh
-        # If your package.json is in a subfolder, set it here, e.g. "app"
         working-directory: .
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Show repo tree (top 200)
-        run: |
-          Get-Location
-          Get-ChildItem -Recurse -File | Select-Object -First 200 | ForEach-Object { $_.FullName }
-
-      - name: Fail early if package.json is missing
-        run: |
-          if (!(Test-Path package.json)) { throw "package.json not found at repo root. If it's in a subfolder, set 'defaults.run.working-directory'." }
-
-      - name: Print package.json name/scripts
-        run: |
-          Get-Content package.json | Select-Object -First 80
-          node -p "require('./package.json').name"
-          node -p "Object.keys(require('./package.json').scripts||{})"
-
-      - name: Setup Node
+      - name: Setup Node 20 (LTS)
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
-          # Do NOT set cache without a lockfile
+          node-version: '20'   # ← switch from 22 to 20
 
-      - name: Setup Python for node-gyp
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
-
-      - name: Prep node-gyp env (MSVC + Python)
+      - name: Show versions
         run: |
-          npm config set python "$(Get-Command python).Source"
-          npm config set msvs_version 2022
-          where.exe python
-          where.exe node
-          where.exe npm
+          node -v
+          npm -v
+
+      - name: Verify package.json exists
+        run: |
+          if (!(Test-Path package.json)) {
+            throw "package.json not found at repo root. If it's in a subfolder, set defaults.run.working-directory."
+          }
+          node -p "require('./package.json').name"
+          node -p "Object.keys(require('./package.json').scripts||{})"
 
       - name: Configure npm
         run: |
@@ -56,13 +39,27 @@ jobs:
           npm config set audit false
           npm config set progress false
           npm config set cache C:\npm\cache
+          $env:NPM_CONFIG_LOGLEVEL = "verbose"
 
-      - name: Install dependencies (prefer lockfile)
+      - name: Install deps (fallback if needed)
         run: |
           if (Test-Path package-lock.json) {
             npm ci --no-audit --no-fund --loglevel=verbose
           } else {
-            npm install --no-audit --no-fund --loglevel=verbose
+            npm install --no-audit --no-fund --loglevel=verbose || `
+            npm install --no-audit --no-fund --legacy-peer-deps --loglevel=verbose
+          }
+
+      - name: Dump npm debug log (on failure)
+        if: failure()
+        run: |
+          $log = Get-ChildItem -Recurse C:\npm\cache\_logs\*-debug-0.log `
+            | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+          if ($log) {
+            "NPM LOG FILE: $($log.FullName)" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+            Get-Content $log.FullName -Raw | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+          } else {
+            "No npm log found in C:\npm\cache\_logs" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
           }
 
       - name: Build renderer
