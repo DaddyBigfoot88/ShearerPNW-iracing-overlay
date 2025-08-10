@@ -1,31 +1,31 @@
 name: build-win
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
+        # If your package.json is in a subfolder, set it here, e.g. "app"
+        working-directory: .
 
     steps:
       - uses: actions/checkout@v4
 
       - name: Show repo tree (top 200)
-        shell: pwsh
         run: |
           Get-Location
-          Get-ChildItem -Recurse -File | Select-Object FullName | Select-Object -First 200
+          Get-ChildItem -Recurse -File | Select-Object -First 200 | ForEach-Object { $_.FullName }
 
       - name: Fail early if package.json is missing
-        shell: pwsh
         run: |
-          if (-not (Test-Path package.json)) {
-            Write-Error "package.json not found at repo root. If your app is in a subfolder, set 'working-directory'."
-          }
+          if (!(Test-Path package.json)) { throw "package.json not found at repo root. If it's in a subfolder, set 'defaults.run.working-directory'." }
 
       - name: Print package.json name/scripts
-        shell: pwsh
         run: |
           Get-Content package.json | Select-Object -First 80
           node -p "require('./package.json').name"
@@ -35,7 +35,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          
+          # Do NOT set cache without a lockfile
 
       - name: Setup Python for node-gyp
         uses: actions/setup-python@v5
@@ -43,7 +43,6 @@ jobs:
           python-version: '3.x'
 
       - name: Prep node-gyp env (MSVC + Python)
-        shell: pwsh
         run: |
           npm config set python "$(Get-Command python).Source"
           npm config set msvs_version 2022
@@ -51,40 +50,19 @@ jobs:
           where.exe node
           where.exe npm
 
-      - name: Show Node/NPM versions
-        run: |
-          node -v
-          npm -v
-
-      - name: Configure npm + set cache
-        shell: pwsh
+      - name: Configure npm
         run: |
           npm config set fund false
           npm config set audit false
           npm config set progress false
           npm config set cache C:\npm\cache
 
-      - name: Install dependencies (verbose + fallback)
-        shell: pwsh
+      - name: Install dependencies (prefer lockfile)
         run: |
-          $env:NPM_CONFIG_LOGLEVEL = "verbose"
-          npm install --no-audit --no-fund --loglevel=verbose
-          if ($LASTEXITCODE -ne 0) {
-            Write-Host "First install failed. Retrying with --legacy-peer-deps…"
-            npm install --no-audit --no-fund --legacy-peer-deps --loglevel=verbose
-          }
-
-      - name: Show npm debug log (on failure)
-        if: failure()
-        shell: pwsh
-        run: |
-          $log = Get-ChildItem -Recurse C:\npm\cache\_logs\*-debug-0.log |
-            Sort-Object LastWriteTime -Descending | Select-Object -First 1
-          if ($log) {
-            "NPM LOG FILE: $($log.FullName)" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
-            Get-Content $log.FullName -Raw | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+          if (Test-Path package-lock.json) {
+            npm ci --no-audit --no-fund --loglevel=verbose
           } else {
-            "No npm log found in C:\npm\cache\_logs" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+            npm install --no-audit --no-fund --loglevel=verbose
           }
 
       - name: Build renderer
