@@ -15,29 +15,38 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Show where we are + list files
-        run: |
-          Write-Host "PWD:" (Get-Location)
-          Get-ChildItem -Force
-          if (-not (Test-Path package.json)) { throw "package.json not found at repo root." }
-
       - name: Setup Node 20 (LTS)
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: Setup Python for node-gyp
+      - name: Setup Python (for node-gyp)
         uses: actions/setup-python@v5
         with:
           python-version: '3.x'
 
-      - name: Prep node-gyp (MSVC + Python)
+      # Set env vars the RIGHT way for node-gyp (no npm flags)
+      - name: Export node-gyp env
         run: |
-          npm config set python "$(Get-Command python).Source"
-          npm config set msvs_version 2022
+          Write-Host "pythonLocation = $env:pythonLocation"
+          "PYTHON=$env:pythonLocation\python.exe" | Out-File -FilePath $env:GITHUB_ENV -Append
+          "GYP_MSVS_VERSION=2022"                | Out-File -FilePath $env:GITHUB_ENV -Append
+          # npm also respects these:
+          "npm_config_python=$env:pythonLocation\python.exe" | Out-File -FilePath $env:GITHUB_ENV -Append
+
+      - name: Show versions
+        run: |
           node -v
           npm -v
           python --version
+
+      - name: Verify package.json exists
+        run: |
+          if (!(Test-Path package.json)) {
+            throw "package.json not found at repo root."
+          }
+          node -p "require('./package.json').name"
+          node -p "Object.keys(require('./package.json').scripts||{})"
 
       - name: Configure npm
         run: |
@@ -47,7 +56,7 @@ jobs:
           npm config set cache C:\npm\cache
           $env:NPM_CONFIG_LOGLEVEL = "verbose"
 
-      - name: Install deps (fallback if needed)
+      - name: Install deps (no scripts, fallback if needed)
         run: |
           if (Test-Path package-lock.json) {
             npm ci --no-audit --no-fund --loglevel=verbose
