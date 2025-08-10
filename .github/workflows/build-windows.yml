@@ -18,7 +18,7 @@ jobs:
       - name: Setup Node 20 (LTS)
         uses: actions/setup-node@v4
         with:
-          node-version: '20'   # ← switch from 22 to 20
+          node-version: '20'
 
       - name: Show versions
         run: |
@@ -41,14 +41,15 @@ jobs:
           npm config set cache C:\npm\cache
           $env:NPM_CONFIG_LOGLEVEL = "verbose"
 
-      - name: Install deps (fallback if needed)
+      # ⬇️ Key change: don't run postinstall scripts during install
+      - name: Install deps (no scripts, no optional)
         run: |
-          if (Test-Path package-lock.json) {
-            npm ci --no-audit --no-fund --loglevel=verbose
-          } else {
-            npm install --no-audit --no-fund --loglevel=verbose || `
-            npm install --no-audit --no-fund --legacy-peer-deps --loglevel=verbose
-          }
+          npm install --ignore-scripts --omit=optional --no-audit --no-fund --loglevel=verbose `
+            || npm install --ignore-scripts --omit=optional --no-audit --no-fund --legacy-peer-deps --loglevel=verbose
+
+      # Rebuild native modules for Electron AFTER install
+      - name: Rebuild native deps for Electron
+        run: npx electron-builder install-app-deps
 
       - name: Dump npm debug log (on failure)
         if: failure()
