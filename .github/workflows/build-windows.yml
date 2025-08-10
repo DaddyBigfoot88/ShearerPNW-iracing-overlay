@@ -7,6 +7,7 @@ on:
 jobs:
   build:
     runs-on: windows-latest
+
     steps:
       - uses: actions/checkout@v4
 
@@ -14,9 +15,41 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+          cache: 'npm'
 
-      - name: Install dependencies (no lockfile required)
-        run: npm install --no-audit --no-fund
+      - name: Show Node/NPM versions
+        run: |
+          node -v
+          npm -v
+
+      # Try normal install; if it fails, retry with --legacy-peer-deps.
+      # Also crank up verbosity so we can see what's wrong.
+      - name: Install dependencies (with fallback)
+        shell: pwsh
+        run: |
+          npm config set fund false
+          npm config set audit false
+          npm config set progress false
+          $env:NPM_CONFIG_LOGLEVEL = "verbose"
+          npm install --no-audit --no-fund --loglevel=verbose
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "First install failed. Retrying with --legacy-peer-deps…"
+            npm install --no-audit --no-fund --legacy-peer-deps --loglevel=verbose
+          }
+
+      # If install still fails, print the latest npm debug log into the summary and upload it.
+      - name: Show npm debug log (on failure)
+        if: failure()
+        shell: pwsh
+        run: |
+          $log = Get-ChildItem -Recurse C:\npm\cache\_logs\*-debug-0.log |
+            Sort-Object LastWriteTime -Descending | Select-Object -First 1
+          if ($log) {
+            "NPM LOG FILE: $($log.FullName)" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+            Get-Content $log.FullName -Raw | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+          } else {
+            "No npm log found in C:\npm\cache\_logs" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+          }
 
       - name: Build renderer
         run: npm run build:ui
