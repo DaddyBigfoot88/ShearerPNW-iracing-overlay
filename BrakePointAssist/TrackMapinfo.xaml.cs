@@ -3484,46 +3484,48 @@ namespace BrakePointAssist
         public float CountdownRatio3 { get; set; } = 0.33f;
     }
 
-    public class TonePlayer
+public class TonePlayer
+{
+    public async System.Threading.Tasks.Task PlaySingleAsync(float frequencyHz, int durationMs = 120, float volume = 0.85f)
     {
-        public async System.Threading.Tasks.Task PlaySingleAsync(float frequencyHz, int durationMs = 120, float volume = 0.85f)
+        try
         {
-            try
+            var tone = new SignalGenerator(44100, 1)
             {
-                var tone = new SignalGenerator(44100, 1)
-                {
-                    Gain = volume,
-                    Type = SignalGeneratorType.Sin,
-                    Frequency = frequencyHz
-                };
-                var take = tone.Take(TimeSpan.FromMilliseconds(durationMs));
-                using var waveOut = new WaveOutEvent();
-                waveOut.Init(take);
-                waveOut.Play();
-                while (waveOut.PlaybackState == PlaybackState.Playing)
-                    await System.Threading.Tasks.Task.Delay(5);
-            }
-            catch
-            {
-                // Ignore audio errors
-            }
+                Gain = volume,
+                Type = SignalGeneratorType.Sin,
+                Frequency = frequencyHz
+            };
+            var take = tone.Take(TimeSpan.FromMilliseconds(durationMs));
+            using var waveOut = new WaveOutEvent();
+            waveOut.Init(take);
+            waveOut.Play();
+            while (waveOut.PlaybackState == PlaybackState.Playing)
+                await System.Threading.Tasks.Task.Delay(5);
         }
-
-        public async System.Threading.Tasks.Task PlayTripleAsync(Config config)
+        catch
         {
-            try
-            {
-                var frequencies = new[] { 600f, 900f, 1200f };
-                foreach (var freq in frequencies)
-                {
-                    await PlaySingleAsync(freq, 120, config.ToneVolume);
-                    await System.Threading.Tasks.Task.Delay(config.ToneGapMs);
-                }
-            }
-            catch
-            {
-                // Ignore audio errors
-            }
+            // Ignore audio errors
         }
     }
 
+    public async System.Threading.Tasks.Task PlayTripleAsync(Config config)
+    {
+        try
+        {
+            var frequencies = new[] { 600f, 900f, 1200f };
+            foreach (var freq in frequencies)
+            {
+                await PlaySingleAsync(freq, 120, config.ToneVolume);
+                await System.Threading.Tasks.Task.Delay(config.ToneGapMs);
+            }
+        }
+        catch
+        {
+            // Ignore audio errors
+        }
+    }
+} // end class TonePlayer
+
+#endregion // closes the last open #region (e.g., Track Map Data Structures)
+} // end namespace BrakePointAssist
