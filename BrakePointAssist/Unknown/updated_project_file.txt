@@ -1,0 +1,135 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <AssemblyTitle>ShearerPNW iRacing Overlay System</AssemblyTitle>
+    <AssemblyDescription>Professional iRacing overlay with customizable panels for lap tracking, car condition monitoring, race awareness, and strategy tools</AssemblyDescription>
+    <AssemblyCompany>ShearerPNW</AssemblyCompany>
+    <AssemblyProduct>iRacing Overlay System</AssemblyProduct>
+    <AssemblyCopyright>Copyright © ShearerPNW 2025</AssemblyCopyright>
+    <AssemblyVersion>2.0.0.0</AssemblyVersion>
+    <FileVersion>2.0.0.0</FileVersion>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    
+    <!-- Self-contained deployment settings -->
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <PublishTrimmed>false</PublishTrimmed>
+    <UseAppHost>true</UseAppHost>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    
+    <!-- Additional settings for overlay functionality -->
+    <StartupObject>ShearerPNW.iRacingOverlay.App</StartupObject>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <Deterministic>true</Deterministic>
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DefineConstants>TRACE</DefineConstants>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Audio library for brake point alerts and UI sounds -->
+    <PackageReference Include="NAudio" Version="2.2.1" />
+    
+    <!-- iRacing SDK - using the correct available version -->
+    <PackageReference Include="irsdkSharp" Version="0.9.0" />
+    
+    <!-- JSON serialization for configuration and layouts -->
+    <PackageReference Include="System.Text.Json" Version="8.0.0" />
+    
+    <!-- Additional WPF and Windows Forms support -->
+    <PackageReference Include="Microsoft.WindowsDesktop.App" Version="8.0.0" />
+    
+    <!-- For enhanced UI effects and animations -->
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.77" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Include application icon -->
+    <Resource Include="icon.ico" />
+    
+    <!-- Include application manifest for proper Windows integration -->
+    <None Include="app.manifest" />
+    
+    <!-- Include configuration files -->
+    <None Include="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    
+    <!-- Include installer scripts -->
+    <None Include="installer.ps1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="install.bat">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    
+    <!-- Include documentation -->
+    <None Include="README.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Folders for organization -->
+    <Folder Include="Panels\" />
+    <Folder Include="Data\" />
+    <Folder Include="Themes\" />
+    <Folder Include="Layouts\" />
+    <Folder Include="Resources\" />
+  </ItemGroup>
+
+  <!-- Post-build events for packaging -->
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)'=='Release'">
+    <Exec Command="echo Creating release package..." />
+    <Exec Command="if not exist &quot;$(OutDir)Package&quot; mkdir &quot;$(OutDir)Package&quot;" />
+    <Exec Command="copy &quot;$(TargetPath)&quot; &quot;$(OutDir)Package\&quot;" />
+    <Exec Command="copy &quot;$(ProjectDir)installer.ps1&quot; &quot;$(OutDir)Package\&quot;" />
+    <Exec Command="copy &quot;$(ProjectDir)install.bat&quot; &quot;$(OutDir)Package\&quot;" />
+    <Exec Command="copy &quot;$(ProjectDir)README.md&quot; &quot;$(OutDir)Package\&quot;" />
+    <Exec Command="if exist &quot;$(ProjectDir)icon.ico&quot; copy &quot;$(ProjectDir)icon.ico&quot; &quot;$(OutDir)Package\&quot;" />
+    <Exec Command="echo Release package created in $(OutDir)Package" />
+  </Target>
+
+  <!-- Custom build target for creating installer package -->
+  <Target Name="CreateInstaller" AfterTargets="Publish">
+    <PropertyGroup>
+      <InstallerDir>$(PublishDir)..\Installer\</InstallerDir>
+    </PropertyGroup>
+    
+    <ItemGroup>
+      <InstallerFiles Include="$(PublishDir)**\*.*" />
+      <InstallerScripts Include="installer.ps1;install.bat;README.md" />
+    </ItemGroup>
+    
+    <MakeDir Directories="$(InstallerDir)" />
+    <Copy SourceFiles="@(InstallerFiles)" DestinationFolder="$(InstallerDir)" />
+    <Copy SourceFiles="@(InstallerScripts)" DestinationFolder="$(InstallerDir)" />
+    
+    <Message Text="Installer package created at: $(InstallerDir)" Importance="high" />
+  </Target>
+
+</Project>
