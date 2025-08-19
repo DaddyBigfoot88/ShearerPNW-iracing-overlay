@@ -2882,7 +2882,7 @@ namespace BrakePointAssist
                         new Corner { Name = "Turn 10", Type = CornerType.Slow, DistanceMeters = 2200 },
                         new Corner { Name = "Turn 14", Type = CornerType.Fast, DistanceMeters = 2700 }
                     }
-                }
+                },
 
                 #endregion
 
@@ -3526,4 +3526,4 @@ namespace BrakePointAssist
             }
         }
     }
-}
+
