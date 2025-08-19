@@ -1,0 +1,1271 @@
+<Window x:Class="BrakePointAssist.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="ShearerPNW iRacing Overlay System" Height="1000" Width="1600"
+        Background="#FF0A0A0A" WindowStartupLocation="CenterScreen" ResizeMode="CanResizeWithGrip">
+
+    <Window.Resources>
+        <!-- Enhanced Styles for Overlay System -->
+        <Style x:Key="ModernButton" TargetType="Button">
+            <Setter Property="Background" Value="#FF2A2A2A"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="BorderBrush" Value="#FF3A3A3A"/>
+            <Setter Property="Padding" Value="15,8"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#FF3A3A3A"/>
+                                <Setter Property="BorderBrush" Value="#FFFF6600"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#FF1A1A1A"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="TabButton" TargetType="Button" BasedOn="{StaticResource ModernButton}">
+            <Setter Property="Background" Value="#FF2A2A2A"/>
+            <Setter Property="BorderBrush" Value="#FF3A3A3A"/>
+            <Setter Property="Padding" Value="20,10"/>
+            <Setter Property="Margin" Value="2,0"/>
+        </Style>
+
+        <Style x:Key="ActiveTabButton" TargetType="Button" BasedOn="{StaticResource TabButton}">
+            <Setter Property="Background" Value="#FFFF6600"/>
+            <Setter Property="BorderBrush" Value="#FFFF6600"/>
+        </Style>
+
+        <Style x:Key="OverlayPanel" TargetType="Border">
+            <Setter Property="Background" Value="#DD1A1A1A"/>
+            <Setter Property="BorderBrush" Value="#FF3A3A3A"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="Margin" Value="5"/>
+        </Style>
+
+        <Style x:Key="DataLabel" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#FFAAAAAA"/>
+            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+
+        <Style x:Key="DataValue" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+
+        <Style x:Key="LargeDataValue" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#FFFF6600"/>
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="FontWeight" Value="Black"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="100"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="60"/>
+        </Grid.RowDefinitions>
+
+        <!-- Enhanced Header with Overlay Branding -->
+        <Border Grid.Row="0">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Color="#FF1A1A1A" Offset="0"/>
+                    <GradientStop Color="#FF2A2A2A" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.Background>
+            <Border BorderBrush="#FFFF6600" BorderThickness="0,0,0,3">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Enhanced Logo and Branding -->
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="25,0">
+                        <Border Width="70" Height="70" Background="#FF0A4A0A" CornerRadius="8" Margin="0,0,15,0">
+                            <Border.Effect>
+                                <DropShadowEffect Color="#FF000000" BlurRadius="8" ShadowDepth="2"/>
+                            </Border.Effect>
+                            <Viewbox Stretch="Uniform" Margin="8">
+                                <Canvas Width="100" Height="100">
+                                    <!-- Racing overlay icon -->
+                                    <Ellipse Canvas.Left="20" Canvas.Top="20" Width="60" Height="60" 
+                                           Stroke="#FFFF6600" StrokeThickness="4" Fill="Transparent"/>
+                                    <Rectangle Canvas.Left="45" Canvas.Top="10" Width="10" Height="20" Fill="#FFFF6600"/>
+                                    <Polygon Points="30,35 50,25 70,35 70,65 50,75 30,65" Fill="#FFE31E24"/>
+                                    <Rectangle Canvas.Left="10" Canvas.Top="85" Width="20" Height="2" Fill="White"/>
+                                    <Rectangle Canvas.Left="15" Canvas.Top="88" Width="15" Height="2" Fill="White"/>
+                                    <Rectangle Canvas.Left="20" Canvas.Top="91" Width="10" Height="2" Fill="White"/>
+                                </Canvas>
+                            </Viewbox>
+                        </Border>
+                        
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="SHEARERPNW" FontSize="28" FontWeight="Black" 
+                                     Foreground="#FFFF6600" FontFamily="Arial Black"/>
+                            <TextBlock Text="iRACING OVERLAY SYSTEM" FontSize="14" FontWeight="Bold"
+                                     Foreground="#FFCCCCCC" FontFamily="Arial" Margin="0,-5,0,0"/>
+                            <TextBlock Text="Professional Racing Dashboard" FontSize="10" 
+                                     Foreground="#FF888888" FontFamily="Arial" Margin="0,-2,0,0"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- Mode Toggle -->
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Button x:Name="ConfigModeButton" Content="📊 CONFIG MODE" Style="{StaticResource ActiveTabButton}"
+                                Click="ConfigModeButton_Click"/>
+                        <Button x:Name="OverlayModeButton" Content="🏁 OVERLAY MODE" Style="{StaticResource TabButton}"
+                                Click="OverlayModeButton_Click"/>
+                    </StackPanel>
+
+                    <!-- Overlay Controls -->
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="20,0">
+                        <Button x:Name="ToggleTopMostButton" Content="📌 ALWAYS ON TOP" Style="{StaticResource ModernButton}"
+                                Click="ToggleTopMostButton_Click" Margin="0,0,10,0"/>
+                        <Button x:Name="SaveLayoutButton" Content="💾 SAVE LAYOUT" Style="{StaticResource ModernButton}"
+                                Click="SaveLayoutButton_Click" Margin="0,0,10,0"/>
+                        <Button x:Name="LoadLayoutButton" Content="📂 LOAD LAYOUT" Style="{StaticResource ModernButton}"
+                                Click="LoadLayoutButton_Click"/>
+                    </StackPanel>
+
+                    <!-- Connection Status -->
+                    <Border Grid.Column="3" Background="#FF2A2A2A" BorderBrush="#FF3A3A3A" 
+                            BorderThickness="1" CornerRadius="8" Padding="20,10" Margin="20,0">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="iRacing:" Foreground="#FFCCCCCC" FontWeight="Bold" Margin="0,0,10,0"/>
+                            <Ellipse x:Name="ConnectionStatus" Width="16" Height="16" Fill="#FFFF0000" Margin="0,0,8,0">
+                                <Ellipse.Effect>
+                                    <DropShadowEffect Color="#FFFF0000" BlurRadius="4" ShadowDepth="0"/>
+                                </Ellipse.Effect>
+                            </Ellipse>
+                            <TextBlock x:Name="ConnectionText" Text="Disconnected" Foreground="#FFCCCCCC" FontWeight="Bold"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
+        </Border>
+
+        <!-- Enhanced Navigation Tabs -->
+        <Border Grid.Row="1" Background="#FF2A2A2A" BorderBrush="#FF3A3A3A" BorderThickness="0,0,0,1">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Button x:Name="DrivingInfoTab" Content="🏎️ DRIVING" Style="{StaticResource ActiveTabButton}" Click="DrivingInfoTab_Click"/>
+                <Button x:Name="CarConditionTab" Content="🛞 CAR STATUS" Style="{StaticResource TabButton}" Click="CarConditionTab_Click"/>
+                <Button x:Name="RaceAwarenessTab" Content="🏁 RACE AWARENESS" Style="{StaticResource TabButton}" Click="RaceAwarenessTab_Click"/>
+                <Button x:Name="StrategyTab" Content="🧠 STRATEGY" Style="{StaticResource TabButton}" Click="StrategyTab_Click"/>
+                <Button x:Name="TelemetryTab" Content="📊 TELEMETRY" Style="{StaticResource TabButton}" Click="TelemetryTab_Click"/>
+                <Button x:Name="TracksTab" Content="🗺️ TRACKS" Style="{StaticResource TabButton}" Click="TracksTab_Click"/>
+                <Button x:Name="SettingsTab" Content="⚙️ SETTINGS" Style="{StaticResource TabButton}" Click="SettingsTab_Click"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Main Content Area -->
+        <Grid Grid.Row="2" x:Name="MainContentGrid">
+            <!-- 🏎️ DRIVING INFO TAB -->
+            <ScrollViewer x:Name="DrivingInfoContent" Visibility="Visible" VerticalScrollBarVisibility="Auto">
+                <Grid Margin="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Lap Tracking Panel -->
+                    <Border Grid.Column="0" Grid.Row="0" Style="{StaticResource OverlayPanel}">
+                        <StackPanel>
+                            <TextBlock Text="🏁 LAP TRACKING" FontSize="16" FontWeight="Bold" 
+                                     Foreground="#FFFF6600" Margin="0,0,0,15"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Grid.Column="0" Grid.Row="0" Text="CURRENT LAP" Style="{StaticResource DataLabel}"/>
+                                <TextBlock Grid.Column="1" Grid.Row="0" x:Name="CurrentLapText" Text="5 / 50" Style="{StaticResource LargeDataValue}"/>
+
+                                <TextBlock Grid.Column="0" Grid.Row="1" Text="LAST PIT STOP" Style="{StaticResource DataLabel}" Margin="0,10,0,0"/>
+                                <TextBlock Grid.Column="1" Grid.Row="1" x:Name="LastPitStopText" Text="Lap 15" Style="{StaticResource DataValue}" Margin="0,10,0,0"/>
+
+                                <TextBlock Grid.Column="0" Grid.Row="2" Text="GREEN FLAG RUN" Style="{StaticResource DataLabel}" Margin="0,5,0,0"/>
+                                <TextBlock Grid.Column="1" Grid.Row="2" x:Name="GreenFlagRunText" Text="12 laps" Style="{StaticResource DataValue}" Margin="0,5,0,0"/>
+
+                                <TextBlock Grid.Column="0" Grid.Row="3" Text="YELLOW FLAG RUN" Style="{StaticResource DataLabel}" Margin="0,5,0,0"/>
+                                <TextBlock Grid.Column="1" Grid.Row="3" x:Name="YellowFlagRunText" Text="3 laps" Style="{StaticResource DataValue}" Margin="0,5,0,0"/>
+
+                                <TextBlock Grid.Column="0" Grid.Row="4" Text="LAPS ON TIRES" Style="{StaticResource DataLabel}" Margin="0,5,0,0"/>
+                                <TextBlock Grid.Column="1" Grid.Row="4" x:Name="TireLapsText" Text="25 (20G + 5Y)" Style="{StaticResource DataValue}" Margin="0,5,0,0"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Timing Panel -->
+                    <Border Grid.Column="1" Grid.Row="0" Style="{StaticResource OverlayPanel}">
+                        <StackPanel>
+                            <TextBlock Text="⏱️ TIMING" FontSize="16" FontWeight="Bold" 
+                                     Foreground="#FFFF6600" Margin="0,0,0,15"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Grid.Column="0" Grid.Row="0" Text="CURRENT LAP" Style="{StaticResource DataLabel}"/>
+                                <TextBlock Grid.Column="1" Grid.Row="0" x:Name="CurrentLapTimeText" Text="1:23.456" Style="{StaticResource LargeDataValue}"/>
+
+                                <TextBlock Grid.Column="0" Grid.Row="1" Text="BEST LAP" Style="{StaticResource DataLabel}" Margin="0,10,0,0"/>
+                                <TextBlock Grid.Column="1" Grid.Row="1" x:Name="BestLapTimeText" Text="1:22.123" Style="{StaticResource DataValue}" Margin="0,10,0,0"/>
+
+                                <TextBlock Grid.Column="0" Grid.Row="2" Text="DELTA" Style="{StaticResource DataLabel}" Margin="0,5,0,0"/>
+                                <TextBlock Grid.Column="1" Grid.Row="2" x:Name="DeltaText" Text="+0.234" Foreground="#FFFF0000" FontSize="14" FontWeight="Bold" Margin="0,5,0,0"/>
+
+                                <TextBlock Grid.Column="0" Grid.Row="3" Text="AVERAGE LAP" Style="{StaticResource DataLabel}" Margin="0,5,0,0"/>
+                                <TextBlock Grid.Column="1" Grid.Row="3" x:Name="AverageLapText" Text="1:23.789" Style="{StaticResource DataValue}" Margin="0,5,0,0"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Input Displays Panel -->
+                    <Border Grid.Column="2" Grid.Row="0" Style="{StaticResource OverlayPanel}">
+                        <StackPanel>
+                            <TextBlock Text="🎮 INPUTS" FontSize="16" FontWeight="Bold" 
+                                     Foreground="#FFFF6600" Margin="0,0,0,15"/>
+                            
+                            <!-- Speed, RPM, Gear -->
+                            <Grid Margin="0,0,0,15">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="SPEED" Style="{StaticResource DataLabel}" HorizontalAlignment="Center"/>
+                                    <TextBlock x:Name="SpeedDisplayText" Text="145" Style="{StaticResource LargeDataValue}" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="km/h" Style="{StaticResource DataLabel}" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                                
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock Text="RPM" Style="{StaticResource DataLabel}" HorizontalAlignment="Center"/>
+                                    <TextBlock x:Name="RPMText" Text="7200" Style="{StaticResource LargeDataValue}" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                                
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="GEAR" Style="{StaticResource DataLabel}" HorizontalAlignment="Center"/>
+                                    <TextBlock x:Name="GearText" Text="4" Style="{StaticResource LargeDataValue}" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- Throttle Bar -->
+                            <Grid Margin="0,0,0,5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="60"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="THROTTLE" Style="{StaticResource DataLabel}" VerticalAlignment="Center"/>
+                                <Border Grid.Column="1" Background="#FF2A2A2A" Height="20" CornerRadius="10">
+                                    <Border x:Name="ThrottleBar" Background="#FF00FF66" HorizontalAlignment="Left" 
+                                           Width="100" Height="18" CornerRadius="9" Margin="1"/>
+                                </Border>
+                            </Grid>
+
+                            <!-- Brake Bar -->
+                            <Grid Margin="0,0,0,5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="60"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="BRAKE" Style="{StaticResource DataLabel}" VerticalAlignment="Center"/>
+                                <Border Grid.Column="1" Background="#FF2A2A2A" Height="20" CornerRadius="10">
+                                    <Border x:Name="BrakeBar" Background="#FFE31E24" HorizontalAlignment="Left" 
+                                           Width="50" Height="18" CornerRadius="9" Margin="1"/>
+                                </Border>
+                            </Grid>
+
+                            <!-- Steering Input -->
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="60"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="STEERING" Style="{StaticResource DataLabel}" VerticalAlignment="Center"/>
+                                <Border Grid.Column="1" Background="#FF2A2A2A" Height="20" CornerRadius="10">
+                                    <Canvas>
+                                        <Border x:Name="SteeringIndicator" Background="#FFFF6600" Width="6" Height="18" 
+                                               CornerRadius="3" Canvas.Left="97" Canvas.Top="1"/>
+                                    </Canvas>
+                                </Border>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Sector Times Panel -->
+                    <Border Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="3" Style="{StaticResource OverlayPanel}">
+                        <StackPanel>
+                            <TextBlock Text="🏁 SECTOR TIMES" FontSize="16" FontWeight="Bold" 
+                                     Foreground="#FFFF6600" Margin="0,0,0,15"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="SECTOR 1" Style="{StaticResource DataLabel}" HorizontalAlignment="Center"/>
+                                    <TextBlock x:Name="Sector1Text" Text="28.123" Foreground="#FF00FF66" FontSize="18" 
+                                             FontWeight="Bold" HorizontalAlignment="Center"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock Text="SECTOR 2" Style="{StaticResource DataLabel}" HorizontalAlignment="Center"/>
+                                    <TextBlock x:Name="Sector2Text" Text="29.456" Foreground="#FFAA00AA" FontSize="18" 
+                                             FontWeight="Bold" HorizontalAlignment="Center"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="SECTOR 3" Style="{StaticResource DataLabel}" HorizontalAlignment="Center"/>
+                                    <TextBlock x:Name="Sector3Text" Text="25.789" Foreground="White" FontSize="18" 
+                                             FontWeight="Bold" HorizontalAlignment="Center"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="3">
+                                    <TextBlock Text="LAP TIME" Style="{StaticResource DataLabel}" HorizontalAlignment="Center"/>
+                                    <TextBlock x:Name="TotalLapTimeText" Text="1:23.368" Foreground="#FFFF6600" FontSize="18" 
+                                             FontWeight="Bold" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Shift Light and Rev Limiter -->
+                    <Border Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="3" Style="{StaticResource OverlayPanel}">
+                        <StackPanel>
+                            <TextBlock Text="🚨 SHIFT LIGHT" FontSize="16" FontWeight="Bold" 
+                                     Foreground="#FFFF6600" Margin="0,0,0,15"/>
+                            <Border Background="#FF1A1A1A" Height="60" CornerRadius="30">
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <Ellipse x:Name="ShiftLight1" Width="40" Height="40" Fill="#FF2A2A2A" Margin="5"/>
+                                    <Ellipse x:Name="ShiftLight2" Width="40" Height="40" Fill="#FF2A2A2A" Margin="5"/>
+                                    <Ellipse x:Name="ShiftLight3" Width="40" Height="40" Fill="#FF2A2A2A" Margin="5"/>
+                                    <Ellipse x:Name="ShiftLight4" Width="40" Height="40" Fill="#FF2A2A2A" Margin="5"/>
+                                    <Ellipse x:Name="ShiftLight5" Width="40" Height="40" Fill="#FF2A2A2A" Margin="5"/>
+                                    <Ellipse x:Name="ShiftLight6" Width="40" Height="40" Fill="#FF2A2A2A" Margin="5"/>
+                                    <Ellipse x:Name="ShiftLight7" Width="40" Height="40" Fill="#FF2A2A2A" Margin="5"/>
+                                    <Ellipse x:Name="ShiftLight8" Width="40" Height="40" Fill="#FF2A2A2A" Margin="5"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </ScrollViewer>
+
+            <!-- 🛞 CAR CONDITION TAB -->
+            <ScrollViewer x:Name="CarConditionContent" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
+                <Grid Margin="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Tire Temps and Pressures -->
+                    <Border Grid.Column="0" Grid.Row="0" Style="{StaticResource OverlayPanel}">
+                        <StackPanel>
+                            <TextBlock Text="🛞 TIRE TEMPERATURES" FontSize="16" FontWeight="Bold" 
+                                     Foreground="#FFFF6600" Margin="0,0,0,15"/>
+                            
+                            <!-- Front Tires -->
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                
+                                <!-- Front Left -->
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="FRONT LEFT" Style="{StaticResource DataLabel}" HorizontalAlignment="Center"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="O" Style="{StaticResource DataLabel}" HorizontalAlignment="Center"/>
+                                            <TextBlock x:Name="FLTireOuterText" Text="85°" Style="{StaticResource DataValue}" HorizontalAlignment="Center"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1">
+                                            <TextBlock Text="M" Style="{StaticResource DataLabel}" HorizontalAlignment="Center"/>
+                                            <TextBlock x:Name="FLTireMiddleText" Text="92°" Style="{StaticResource DataValue}" HorizontalAlignment="Center"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="2">
+                                            <TextBlock Text="I" Style="{StaticResource DataLabel}" HorizontalAlignment="Center"/>
+                                            <TextBlock x:Name="FLTireInnerText" Text="88°" Style="{StaticResource DataValue}" HorizontalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Grid>
+                                    <TextBlock x:Name="FLTirePressureText" Text="28.5 PSI" Style="{StaticResource DataLabel}" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+                                </StackPanel>
+
+                                <!-- Front Right -->
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock Text="FRONT RIGHT" Style="{StaticResource DataLabel}" HorizontalAlignment="Center"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="I" Style="{StaticResource DataLabel}" HorizontalAlignment="Center"/>
+                                            <TextBlock x:Name="FRTireInnerText" Text="89°" Style="{StaticResource DataValue}" HorizontalAlignment="Center"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1">
+                                            <TextBlock Text="M" Style="{StaticResource DataLabel}" HorizontalAlignment="Center"/>
+                                            <TextBlock x:Name="FRTireMiddleText" Text="93°" Style="{StaticResource DataValue}" HorizontalAlignment="Center"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="2">
+                                            <TextBlock Text="O" Style="{StaticResource DataLabel}" HorizontalAlignment="Center"/>
+                                            <TextBlock x:Name="FRTireOuterText" Text="86°" Style="{StaticResource DataValue}" HorizontalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Grid>
+                                    <TextBlock x:Name="FRTirePressureText" Text="28.8 PSI" Style="{StaticResource DataLabel}" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- Rear Tires -->
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                
+                                <!-- Rear Left -->
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="REAR LEFT" Style="{StaticResource DataLabel}" HorizontalAlignment="Center"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="O" Style="{StaticResource DataLabel}" HorizontalAlignment="Center"/>
+                                            <TextBlock x:Name="RLTireOuterText" Text="78°" Style="{StaticResource DataValue}" HorizontalAlignment="Center"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1">
+                                            <TextBlock Text="M" Style="{StaticResource DataLabel}" HorizontalAlignment="Center"/>
+                                            <TextBlock x:Name="RLTireMiddleText" Text="84°" Style="{StaticResource DataValue}" HorizontalAlignment="Center"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="2">
+                                            <TextBlock Text="I" Style="{StaticResource DataLabel}" HorizontalAlignment="Center"/>
+                                            <TextBlock x:Name="RLTireInnerText" Text="81°" Style="{StaticResource DataValue}" HorizontalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Grid>
+                                    <TextBlock x:Name="RLTirePressureText" Text="27.2 PSI" Style="{StaticResource DataLabel}" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+                                </StackPanel>
+
+                                <!-- Rear Right -->
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock Text="REAR RIGHT" Style="{StaticResource DataLabel}" HorizontalAlignment="Center"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="I" Style="{StaticResource DataLabel}" HorizontalAlignment="Center"/>
+                                            <TextBlock x:Name="RRTireInnerText" Text="82°" Style="{StaticResource DataValue}" HorizontalAlignment="Center"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1">
+                                            <TextBlock Text="M" Style="{StaticResource DataLabel}" HorizontalAlignment="Center"/>
+                                            <TextBlock x:Name="RRTireMiddleText" Text="85°" Style="{StaticResource DataValue}" HorizontalAlignment="Center"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="2">
+                                            <TextBlock Text="O" Style="{StaticResource DataLabel}" HorizontalAlignment="Center"/>
+                                            <TextBlock x:Name="RRTireOuterText" Text="79°" Style="{StaticResource DataValue}" HorizontalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Grid>
+                                    <TextBlock x:Name="RRTirePressureText" Text="27.5 PSI" Style="{StaticResource DataLabel}" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Fuel and Brake Info -->
+                    <Border Grid.Column="1" Grid.Row="0" Style="{StaticResource OverlayPanel}">
+                        <StackPanel>
+                            <TextBlock Text="⛽ FUEL & BRAKES" FontSize="16" FontWeight="Bold" 
+                                     Foreground="#FFFF6600" Margin="0,0,0,15"/>
+                            
+                            <!-- Fuel -->
+                            <Grid Margin="0,0,0,15">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Grid.Column="0" Grid.Row="0" Text="FUEL REMAINING" Style="{StaticResource DataLabel}"/>
+                                <TextBlock Grid.Column="1" Grid.Row="0" x:Name="FuelRemainingText" Text="45.8L" Style="{StaticResource LargeDataValue}"/>
+
+                                <TextBlock Grid.Column="0" Grid.Row="1" Text="LAPS REMAINING" Style="{StaticResource DataLabel}" Margin="0,5,0,0"/>
+                                <TextBlock Grid.Column="1" Grid.Row="1" x:Name="FuelLapsText" Text="12.3 laps" Style="{StaticResource DataValue}" Margin="0,5,0,0"/>
+
+                                <TextBlock Grid.Column="0" Grid.Row="2" Text="FUEL %" Style="{StaticResource DataLabel}" Margin="0,5,0,0"/>
+                                <TextBlock Grid.Column="1" Grid.Row="2" x:Name="FuelPercentText" Text="76%" Style="{StaticResource DataValue}" Margin="0,5,0,0"/>
+                            </Grid>
+
+                            <!-- Brake Temps -->
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Grid.Column="0" Grid.Row="0" Text="BRAKE TEMPS" Style="{StaticResource DataLabel}"/>
+                                <TextBlock Grid.Column="1" Grid.Row="0" Text="BRAKE BIAS" Style="{StaticResource DataLabel}"/>
+
+                                <StackPanel Grid.Column="0" Grid.Row="1" Orientation="Horizontal" Margin="0,5,0,0">
+                                    <StackPanel Margin="0,0,10,0">
+                                        <TextBlock Text="FL" Style="{StaticResource DataLabel}" HorizontalAlignment="Center"/>
+                                        <TextBlock x:Name="FLBrakeTempText" Text="320°" Style="{StaticResource DataValue}" HorizontalAlignment="Center"/>
+                                    </StackPanel>
+                                    <StackPanel>
+                                        <TextBlock Text="FR" Style="{StaticResource DataLabel}" HorizontalAlignment="Center"/>
+                                        <TextBlock x:Name="FRBrakeTempText" Text="315°" Style="{StaticResource DataValue}" HorizontalAlignment="Center"/>
+                                    </StackPanel>
+                                </StackPanel>
+
+                                <TextBlock Grid.Column="1" Grid.Row="1" x:Name="BrakeBiasText" Text="58.2%" Style="{StaticResource LargeDataValue}" Margin="0,5,0,0"/>
+
+                                <StackPanel Grid.Column="0" Grid.Row="2" Orientation="Horizontal" Margin="0,5,0,0">
+                                    <StackPanel Margin="0,0,10,0">
+                                        <TextBlock Text="RL" Style="{StaticResource DataLabel}" HorizontalAlignment="Center"/>
+                                        <TextBlock x:Name="RLBrakeTempText" Text="285°" Style="{StaticResource DataValue}" HorizontalAlignment="Center"/>
+                                    </StackPanel>
+                                    <StackPanel>
+                                        <TextBlock Text="RR" Style="{StaticResource DataLabel}" HorizontalAlignment="Center"/>
+                                        <TextBlock x:Name="RRBrakeTempText" Text="280°" Style="{StaticResource DataValue}" HorizontalAlignment="Center"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Tire Wear Panel -->
+                    <Border Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Style="{StaticResource OverlayPanel}">
+                        <StackPanel>
+                            <TextBlock Text="🔴 TIRE WEAR" FontSize="16" FontWeight="Bold" 
+                                     Foreground="#FFFF6600" Margin="0,0,0,15"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="FRONT LEFT" Style="{StaticResource DataLabel}" HorizontalAlignment="Center"/>
+                                    <Border Background="#FF2A2A2A" Height="100" Width="60" CornerRadius="5" Margin="5">
+                                        <Border x:Name="FLTireWear" Background="#FF00FF66" Height="75" Width="58" 
+                                               CornerRadius="4" VerticalAlignment="Bottom"/>
+                                    </Border>
+                                    <TextBlock x:Name="FLTireWearText" Text="85%" Style="{StaticResource DataValue}" HorizontalAlignment="Center"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock Text="FRONT RIGHT" Style="{StaticResource DataLabel}" HorizontalAlignment="Center"/>
+                                    <Border Background="#FF2A2A2A" Height="100" Width="60" CornerRadius="5" Margin="5">
+                                        <Border x:Name="FRTireWear" Background="#FF00FF66" Height="78" Width="58" 
+                                               CornerRadius="4" VerticalAlignment="Bottom"/>
+                                    </Border>
+                                    <TextBlock x:Name="FRTireWearText" Text="82%" Style="{StaticResource DataValue}" HorizontalAlignment="Center"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="REAR LEFT" Style="{StaticResource DataLabel}" HorizontalAlignment="Center"/>
+                                    <Border Background="#FF2A2A2A" Height="100" Width="60" CornerRadius="5" Margin="5">
+                                        <Border x:Name="RLTireWear" Background="#FFFF6600" Height="60" Width="58" 
+                                               CornerRadius="4" VerticalAlignment="Bottom"/>
+                                    </Border>
+                                    <TextBlock x:Name="RLTireWearText" Text="68%" Style="{StaticResource DataValue}" HorizontalAlignment="Center"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="3">
+                                    <TextBlock Text="REAR RIGHT" Style="{StaticResource DataLabel}" HorizontalAlignment="Center"/>
+                                    <Border Background="#FF2A2A2A" Height="100" Width="60" CornerRadius="5" Margin="5">
+                                        <Border x:Name="RRTireWear" Background="#FFFF6600" Height="65" Width="58" 
+                                               CornerRadius="4" VerticalAlignment="Bottom"/>
+                                    </Border>
+                                    <TextBlock x:Name="RRTireWearText" Text="71%" Style="{StaticResource DataValue}" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </ScrollViewer>
+
+            <!-- 🏁 RACE AWARENESS TAB -->
+            <ScrollViewer x:Name="RaceAwarenessContent" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
+                <Grid Margin="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Track Map with Cars -->
+                    <Border Grid.Column="0" Grid.Row="0" Style="{StaticResource OverlayPanel}">
+                        <StackPanel>
+                            <TextBlock Text="🗺️ TRACK MAP" FontSize="16" FontWeight="Bold" 
+                                     Foreground="#FFFF6600" Margin="0,0,0,15"/>
+                            <Canvas x:Name="TrackMapCanvas" Height="300" Background="#FF0A0A0A">
+                                <!-- Track map will be drawn here -->
+                            </Canvas>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Relatives and Standings -->
+                    <Border Grid.Column="1" Grid.Row="0" Style="{StaticResource OverlayPanel}">
+                        <StackPanel>
+                            <TextBlock Text="🏁 RELATIVE TIMING" FontSize="16" FontWeight="Bold" 
+                                     Foreground="#FFFF6600" Margin="0,0,0,15"/>
+                            <ScrollViewer Height="300" VerticalScrollBarVisibility="Auto">
+                                <StackPanel x:Name="RelativeTimingPanel">
+                                    <!-- Relative timing entries will be added here -->
+                                    <Border Background="#FF2A2A2A" Margin="0,2" Padding="8" CornerRadius="4">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="30"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="P5" Style="{StaticResource DataValue}"/>
+                                            <TextBlock Grid.Column="1" Text="J. Smith #42" Style="{StaticResource DataValue}"/>
+                                            <TextBlock Grid.Column="2" Text="-2.345" Foreground="#FF00FF66" FontWeight="Bold"/>
+                                        </Grid>
+                                    </Border>
+                                    <Border Background="#FFFF6600" Margin="0,2" Padding="8" CornerRadius="4">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="30"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="P6" Style="{StaticResource DataValue}" Foreground="Black"/>
+                                            <TextBlock Grid.Column="1" Text="YOU #18" Style="{StaticResource DataValue}" Foreground="Black"/>
+                                            <TextBlock Grid.Column="2" Text="---" Foreground="Black" FontWeight="Bold"/>
+                                        </Grid>
+                                    </Border>
+                                    <Border Background="#FF2A2A2A" Margin="0,2" Padding="8" CornerRadius="4">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="30"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="P7" Style="{StaticResource DataValue}"/>
+                                            <TextBlock Grid.Column="1" Text="M. Johnson #7" Style="{StaticResource DataValue}"/>
+                                            <TextBlock Grid.Column="2" Text="+1.782" Foreground="#FFFF0000" FontWeight="Bold"/>
+                                        </Grid>
+                                    </Border>
+                                </StackPanel>
+                            </ScrollViewer>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Flags and Alerts -->
+                    <Border Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Style="{StaticResource OverlayPanel}">
+                        <StackPanel>
+                            <TextBlock Text="🚩 FLAGS & ALERTS" FontSize="16" FontWeight="Bold" 
+                                     Foreground="#FFFF6600" Margin="0,0,0,15"/>
+                            
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Current Flag -->
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="CURRENT FLAG" Style="{StaticResource DataLabel}" HorizontalAlignment="Center"/>
+                                    <Border x:Name="CurrentFlagBorder" Background="#FF00FF66" Height="80" Width="120" 
+                                           CornerRadius="8" Margin="10">
+                                        <TextBlock x:Name="CurrentFlagText" Text="🟢 GREEN" FontSize="16" FontWeight="Bold" 
+                                                 Foreground="Black" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                </StackPanel>
+
+                                <!-- Blind Spot Alerts -->
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock Text="BLIND SPOT" Style="{StaticResource DataLabel}" HorizontalAlignment="Center"/>
+                                    <Grid Margin="10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Border Grid.Column="0" x:Name="LeftBlindSpot" Background="#FF2A2A2A" Height="40" 
+                                               CornerRadius="6" Margin="5">
+                                            <TextBlock Text="⬅ LEFT" HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                                     Style="{StaticResource DataLabel}"/>
+                                        </Border>
+                                        <Border Grid.Column="1" x:Name="RightBlindSpot" Background="#FFFF0000" Height="40" 
+                                               CornerRadius="6" Margin="5">
+                                            <TextBlock Text="RIGHT ➡" HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                                     Foreground="White" FontWeight="Bold"/>
+                                        </Border>
+                                    </Grid>
+                                </StackPanel>
+
+                                <!-- Track Alerts -->
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="TRACK ALERTS" Style="{StaticResource DataLabel}" HorizontalAlignment="Center"/>
+                                    <Border x:Name="TrackAlertBorder" Background="#FFFFFF00" Height="80" Width="120" 
+                                           CornerRadius="8" Margin="10">
+                                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                            <TextBlock Text="⚠️" FontSize="20"/>
+                                            <TextBlock Text="SLOW CAR" FontSize="12" FontWeight="Bold" Foreground="Black"/>
+                                            <TextBlock Text="AHEAD" FontSize="12" FontWeight="Bold" Foreground="Black"/>
+                                        </StackPanel>
+                                    </Border>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </ScrollViewer>
+
+            <!-- 🧠 STRATEGY TAB -->
+            <ScrollViewer x:Name="StrategyContent" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
+                <Grid Margin="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Fuel Strategy -->
+                    <Border Grid.Column="0" Grid.Row="0" Style="{StaticResource OverlayPanel}">
+                        <StackPanel>
+                            <TextBlock Text="⛽ FUEL STRATEGY" FontSize="16" FontWeight="Bold" 
+                                     Foreground="#FFFF6600" Margin="0,0,0,15"/>
+                            
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Grid.Column="0" Grid.Row="0" Text="AVG USAGE" Style="{StaticResource DataLabel}"/>
+                                <TextBlock Grid.Column="1" Grid.Row="0" x:Name="AvgFuelUsageText" Text="3.2L/lap" Style="{StaticResource DataValue}"/>
+
+                                <TextBlock Grid.Column="0" Grid.Row="1" Text="MIN USAGE" Style="{StaticResource DataLabel}" Margin="0,5,0,0"/>
+                                <TextBlock Grid.Column="1" Grid.Row="1" x:Name="MinFuelUsageText" Text="2.8L/lap" Style="{StaticResource DataValue}" Margin="0,5,0,0"/>
+
+                                <TextBlock Grid.Column="0" Grid.Row="2" Text="MAX USAGE" Style="{StaticResource DataLabel}" Margin="0,5,0,0"/>
+                                <TextBlock Grid.Column="1" Grid.Row="2" x:Name="MaxFuelUsageText" Text="3.6L/lap" Style="{StaticResource DataValue}" Margin="0,5,0,0"/>
+
+                                <TextBlock Grid.Column="0" Grid.Row="3" Text="FUEL TO FINISH" Style="{StaticResource DataLabel}" Margin="0,10,0,0"/>
+                                <TextBlock Grid.Column="1" Grid.Row="3" x:Name="FuelToFinishText" Text="65.2L" Style="{StaticResource LargeDataValue}" Margin="0,10,0,0"/>
+
+                                <TextBlock Grid.Column="0" Grid.Row="4" Text="PIT WINDOW" Style="{StaticResource DataLabel}" Margin="0,10,0,0"/>
+                                <TextBlock Grid.Column="1" Grid.Row="4" x:Name="PitWindowText" Text="Lap 25-30" Style="{StaticResource DataValue}" Margin="0,10,0,0"/>
+
+                                <TextBlock Grid.Column="0" Grid.Row="5" Text="ADD FUEL" Style="{StaticResource DataLabel}" Margin="0,5,0,0"/>
+                                <TextBlock Grid.Column="1" Grid.Row="5" x:Name="AddFuelText" Text="48.5L" Style="{StaticResource DataValue}" Margin="0,5,0,0"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Tire Strategy -->
+                    <Border Grid.Column="1" Grid.Row="0" Style="{StaticResource OverlayPanel}">
+                        <StackPanel>
+                            <TextBlock Text="🛞 TIRE STRATEGY" FontSize="16" FontWeight="Bold" 
+                                     Foreground="#FFFF6600" Margin="0,0,0,15"/>
+                            
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Grid.Column="0" Grid.Row="0" Text="CURRENT SET" Style="{StaticResource DataLabel}"/>
+                                <TextBlock Grid.Column="1" Grid.Row="0" x:Name="CurrentTireSetText" Text="Set 2" Style="{StaticResource LargeDataValue}"/>
+
+                                <TextBlock Grid.Column="0" Grid.Row="1" Text="LAPS ON SET" Style="{StaticResource DataLabel}" Margin="0,10,0,0"/>
+                                <TextBlock Grid.Column="1" Grid.Row="1" x:Name="LapsOnSetText" Text="18 laps" Style="{StaticResource DataValue}" Margin="0,10,0,0"/>
+
+                                <TextBlock Grid.Column="0" Grid.Row="2" Text="GREEN LAPS" Style="{StaticResource DataLabel}" Margin="0,5,0,0"/>
+                                <TextBlock Grid.Column="1" Grid.Row="2" x:Name="GreenLapsText" Text="15 laps" Style="{StaticResource DataValue}" Margin="0,5,0,0"/>
+
+                                <TextBlock Grid.Column="0" Grid.Row="3" Text="YELLOW LAPS" Style="{StaticResource DataLabel}" Margin="0,5,0,0"/>
+                                <TextBlock Grid.Column="1" Grid.Row="3" x:Name="YellowLapsText" Text="3 laps" Style="{StaticResource DataValue}" Margin="0,5,0,0"/>
+
+                                <TextBlock Grid.Column="0" Grid.Row="4" Text="SETS REMAINING" Style="{StaticResource DataLabel}" Margin="0,10,0,0"/>
+                                <TextBlock Grid.Column="1" Grid.Row="4" x:Name="SetsRemainingText" Text="4 sets" Style="{StaticResource DataValue}" Margin="0,10,0,0"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Pit Stop History -->
+                    <Border Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Style="{StaticResource OverlayPanel}">
+                        <StackPanel>
+                            <TextBlock Text="🔧 PIT STOP HISTORY" FontSize="16" FontWeight="Bold" 
+                                     Foreground="#FFFF6600" Margin="0,0,0,15"/>
+                            
+                            <ScrollViewer Height="200" VerticalScrollBarVisibility="Auto">
+                                <StackPanel x:Name="PitStopHistoryPanel">
+                                    <!-- Pit stop entries will be added here -->
+                                    <Border Background="#FF2A2A2A" Margin="0,2" Padding="8" CornerRadius="4">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="60"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="80"/>
+                                                <ColumnDefinition Width="80"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="Lap 15" Style="{StaticResource DataValue}"/>
+                                            <TextBlock Grid.Column="1" Text="Fuel + Tires" Style="{StaticResource DataValue}"/>
+                                            <TextBlock Grid.Column="2" Text="45.2L" Style="{StaticResource DataValue}"/>
+                                            <TextBlock Grid.Column="3" Text="24.3s" Style="{StaticResource DataValue}"/>
+                                        </Grid>
+                                    </Border>
+                                    <Border Background="#FF2A2A2A" Margin="0,2" Padding="8" CornerRadius="4">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="60"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="80"/>
+                                                <ColumnDefinition Width="80"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="Lap 5" Style="{StaticResource DataValue}"/>
+                                            <TextBlock Grid.Column="1" Text="Fuel Only" Style="{StaticResource DataValue}"/>
+                                            <TextBlock Grid.Column="2" Text="52.8L" Style="{StaticResource DataValue}"/>
+                                            <TextBlock Grid.Column="3" Text="12.7s" Style="{StaticResource DataValue}"/>
+                                        </Grid>
+                                    </Border>
+                                </StackPanel>
+                            </ScrollViewer>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Session Summary -->
+                    <Border Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" Style="{StaticResource OverlayPanel}">
+                        <StackPanel>
+                            <TextBlock Text="📊 SESSION SUMMARY" FontSize="16" FontWeight="Bold" 
+                                     Foreground="#FFFF6600" Margin="0,0,0,15"/>
+                            
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="LAPS COMPLETED" Style="{StaticResource DataLabel}" HorizontalAlignment="Center"/>
+                                    <TextBlock x:Name="LapsCompletedText" Text="42" Style="{StaticResource LargeDataValue}" HorizontalAlignment="Center"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock Text="CONSISTENCY" Style="{StaticResource DataLabel}" HorizontalAlignment="Center"/>
+                                    <TextBlock x:Name="ConsistencyText" Text="±0.234" Style="{StaticResource LargeDataValue}" HorizontalAlignment="Center"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="INCIDENTS" Style="{StaticResource DataLabel}" HorizontalAlignment="Center"/>
+                                    <TextBlock x:Name="IncidentsText" Text="2x" Style="{StaticResource LargeDataValue}" HorizontalAlignment="Center"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="3">
+                                    <TextBlock Text="POSITION DELTA" Style="{StaticResource DataLabel}" HorizontalAlignment="Center"/>
+                                    <TextBlock x:Name="PositionDeltaText" Text="+3" Foreground="#FF00FF66" FontSize="20" 
+                                             FontWeight="Black" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </ScrollViewer>
+
+            <!-- 📊 TELEMETRY TAB (Enhanced with Original Brake Point System) -->
+            <ScrollViewer x:Name="TelemetryContent" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
+                <Grid Margin="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="350"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="300"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Original Brake Point Controls (Enhanced) -->
+                    <Border Grid.Column="0" Style="{StaticResource OverlayPanel}">
+                        <StackPanel>
+                            <TextBlock Text="🔴 BRAKE POINT ASSISTANT" FontSize="16" FontWeight="Bold" 
+                                     Foreground="#FFFF6600" Margin="0,0,0,15"/>
+                            
+                            <Button x:Name="RecordButton" Content="START RECORDING" Style="{StaticResource ModernButton}"
+                                    Background="#FFE31E24" Margin="0,0,0,12" Click="RecordButton_Click" Height="50" FontSize="16"/>
+                            
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Button x:Name="SaveButton" Grid.Column="0" Content="SAVE" Style="{StaticResource ModernButton}"
+                                        Background="#FF00AA44" Margin="0,0,5,0" Click="SaveButton_Click"/>
+                                <Button x:Name="LoadButton" Grid.Column="1" Content="LOAD" Style="{StaticResource ModernButton}"
+                                        Margin="5,0,0,0" Click="LoadButton_Click"/>
+                            </Grid>
+
+                            <!-- Brake Point Settings -->
+                            <TextBlock Text="LEAD DISTANCE" Foreground="White" FontWeight="Bold" Margin="0,20,0,8"/>
+                            <Grid Margin="0,0,0,15">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Slider x:Name="LeadDistanceSlider" Grid.Column="0" Minimum="20" Maximum="150" 
+                                        Value="75" TickFrequency="5" IsSnapToTickEnabled="True" 
+                                        ValueChanged="LeadDistanceSlider_ValueChanged" Height="20"/>
+                                <Border Grid.Column="1" Background="#FF2A2A2A" CornerRadius="4" Padding="8,4" Margin="10,0,0,0">
+                                    <TextBlock x:Name="LeadDistanceText" Text="75m" Foreground="#FFFF6600" FontWeight="Bold"/>
+                                </Border>
+                            </Grid>
+
+                            <TextBlock Text="ALERT VOLUME" Foreground="White" FontWeight="Bold" Margin="0,0,0,8"/>
+                            <Grid Margin="0,0,0,15">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Slider x:Name="VolumeSlider" Grid.Column="0" Minimum="0" Maximum="1" 
+                                        Value="0.85" TickFrequency="0.05" IsSnapToTickEnabled="True"
+                                        ValueChanged="VolumeSlider_ValueChanged" Height="20"/>
+                                <Border Grid.Column="1" Background="#FF2A2A2A" CornerRadius="4" Padding="8,4" Margin="10,0,0,0">
+                                    <TextBlock x:Name="VolumeText" Text="85%" Foreground="#FF00FF66" FontWeight="Bold"/>
+                                </Border>
+                            </Grid>
+
+                            <CheckBox x:Name="OnlyWhenNotBrakingCheck" Content="Only alert when not braking" 
+                                      Foreground="White" IsChecked="True" FontWeight="Bold" Margin="0,0,0,15"
+                                      Checked="OnlyWhenNotBrakingCheck_Changed" Unchecked="OnlyWhenNotBrakingCheck_Changed"/>
+
+                            <Button x:Name="TestBeepButton" Content="🔊 TEST ALERT SOUND" 
+                                    Style="{StaticResource ModernButton}" Background="#FFFF6600"
+                                    Click="TestBeepButton_Click" Height="40" FontSize="12"/>
+
+                            <!-- Track Info -->
+                            <TextBlock Text="CURRENT TRACK" FontSize="14" FontWeight="Bold" 
+                                     Foreground="White" Margin="0,20,0,5"/>
+                            <TextBlock x:Name="TrackNameText" Text="Not Connected" FontSize="14" FontWeight="Bold"
+                                     Foreground="#FFFF6600" Margin="0,0,0,10" TextWrapping="Wrap"/>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="LAP" FontSize="10" Foreground="#FFAAAAAA" HorizontalAlignment="Center"/>
+                                    <TextBlock x:Name="LapNumberText" Text="0" FontSize="20" FontWeight="Bold" 
+                                             Foreground="#FFFF6600" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                                
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock Text="ZONES" FontSize="10" Foreground="#FFAAAAAA" HorizontalAlignment="Center"/>
+                                    <TextBlock x:Name="ZoneCountText" Text="0" FontSize="20" FontWeight="Bold" 
+                                             Foreground="#FFE31E24" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Enhanced Track Visualization -->
+                    <Border Grid.Column="1" Style="{StaticResource OverlayPanel}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            
+                            <Grid Grid.Row="0" Margin="0,0,0,15">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                
+                                <Rectangle Grid.Column="0" Width="4" Height="20" Fill="#FFFF6600" Margin="0,0,15,0"/>
+                                <TextBlock Grid.Column="1" Text="TRACK VISUALIZATION" FontSize="18" FontWeight="Bold" 
+                                         Foreground="#FFFF6600" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="2" x:Name="TrackLengthText" Text="" FontSize="12" 
+                                         Foreground="#FFAAAAAA" VerticalAlignment="Center"/>
+                            </Grid>
+                            
+                            <Border Grid.Row="1" Background="#FF0A0A0A" BorderBrush="#FF2A2A2A" BorderThickness="1" 
+                                    CornerRadius="8" Padding="10">
+                                <Canvas x:Name="TrackCanvas" ClipToBounds="True">
+                                    <Canvas.Background>
+                                        <RadialGradientBrush>
+                                            <GradientStop Color="#FF0A0A0A" Offset="0"/>
+                                            <GradientStop Color="#FF050505" Offset="1"/>
+                                        </RadialGradientBrush>
+                                    </Canvas.Background>
+                                </Canvas>
+                            </Border>
+
+                            <!-- Track Legend -->
+                            <Grid Grid.Row="2" Margin="0,10,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                
+                                <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <Ellipse Width="12" Height="12" Fill="#FF00FF66" Margin="0,0,5,0"/>
+                                    <TextBlock Text="Current Position" FontSize="10" Foreground="#FFAAAAAA" VerticalAlignment="Center"/>
+                                </StackPanel>
+                                
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <Ellipse Width="12" Height="12" Fill="#FFE31E24" Margin="0,0,5,0"/>
+                                    <TextBlock Text="Brake Zones" FontSize="10" Foreground="#FFAAAAAA" VerticalAlignment="Center"/>
+                                </StackPanel>
+                                
+                                <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <Rectangle Width="12" Height="3" Fill="#FFFF6600" Margin="0,0,5,0"/>
+                                    <TextBlock Text="Track Surface" FontSize="10" Foreground="#FFAAAAAA" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Grid>
+                        </Grid>
+                    </Border>
+
+                    <!-- Input Telemetry Panel -->
+                    <Border Grid.Column="2" Style="{StaticResource OverlayPanel}">
+                        <StackPanel>
+                            <TextBlock Text="📈 INPUT TELEMETRY" FontSize="16" FontWeight="Bold" 
+                                     Foreground="#FFFF6600" Margin="0,0,0,15"/>
+                            
+                            <!-- Throttle Trace -->
+                            <TextBlock Text="THROTTLE TRACE" Style="{StaticResource DataLabel}" Margin="0,0,0,5"/>
+                            <Canvas Height="60" Background="#FF1A1A1A" Margin="0,0,0,10">
+                                <Polyline x:Name="ThrottleTrace" Stroke="#FF00FF66" StrokeThickness="2"/>
+                            </Canvas>
+
+                            <!-- Brake Trace -->
+                            <TextBlock Text="BRAKE TRACE" Style="{StaticResource DataLabel}" Margin="0,0,0,5"/>
+                            <Canvas Height="60" Background="#FF1A1A1A" Margin="0,0,0,10">
+                                <Polyline x:Name="BrakeTrace" Stroke="#FFE31E24" StrokeThickness="2"/>
+                            </Canvas>
+
+                            <!-- Steering Trace -->
+                            <TextBlock Text="STEERING TRACE" Style="{StaticResource DataLabel}" Margin="0,0,0,5"/>
+                            <Canvas Height="60" Background="#FF1A1A1A" Margin="0,0,0,15">
+                                <Polyline x:Name="SteeringTrace" Stroke="#FFFF6600" StrokeThickness="2"/>
+                            </Canvas>
+
+                            <!-- Delta Graph -->
+                            <TextBlock Text="LAP DELTA" Style="{StaticResource DataLabel}" Margin="0,0,0,5"/>
+                            <Canvas Height="80" Background="#FF1A1A1A" Margin="0,0,0,15">
+                                <Line x:Name="DeltaZeroLine" X1="0" X2="260" Y1="40" Y2="40" 
+                                     Stroke="#FF666666" StrokeThickness="1"/>
+                                <Polyline x:Name="DeltaTrace" Stroke="#FFAA00AA" StrokeThickness="2"/>
+                            </Canvas>
+
+                            <!-- Quick Actions -->
+                            <Button Content="CLEAR TRACES" Style="{StaticResource ModernButton}"
+                                    Background="#FF8B4513" Margin="0,0,0,10" Click="ClearTracesButton_Click"/>
+                            <Button Content="SAVE TELEMETRY" Style="{StaticResource ModernButton}"
+                                    Click="SaveTelemetryButton_Click"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </ScrollViewer>
+
+            <!-- 🗺️ TRACKS TAB (From Original) -->
+            <ScrollViewer x:Name="TracksContent" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
+                <Grid Margin="10">
+                    <!-- Original Tracks content will be preserved here -->
+                    <TextBlock Text="🗺️ Track Maps - Coming Soon!" FontSize="20" FontWeight="Bold" 
+                             Foreground="#FFFF6600" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Grid>
+            </ScrollViewer>
+
+            <!-- ⚙️ SETTINGS TAB (Enhanced) -->
+            <ScrollViewer x:Name="SettingsContent" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
+                <Grid Margin="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Overlay Settings -->
+                    <Border Grid.Column="0" Style="{StaticResource OverlayPanel}">
+                        <StackPanel>
+                            <TextBlock Text="🎛️ OVERLAY SETTINGS" FontSize="16" FontWeight="Bold" 
+                                     Foreground="#FFFF6600" Margin="0,0,0,15"/>
+                            
+                            <CheckBox x:Name="AlwaysOnTopCheck" Content="Always on top" 
+                                      Foreground="White" FontWeight="Bold" Margin="0,0,0,10"/>
+                            <CheckBox x:Name="TransparentBackgroundCheck" Content="Transparent background" 
+                                      Foreground="White" FontWeight="Bold" Margin="0,0,0,10"/>
+                            <CheckBox x:Name="ClickThroughCheck" Content="Click-through mode" 
+                                      Foreground="White" FontWeight="Bold" Margin="0,0,0,10"/>
+                            
+                            <TextBlock Text="OPACITY" Foreground="White" FontWeight="Bold" Margin="0,15,0,5"/>
+                            <Slider x:Name="OpacitySlider" Minimum="0.3" Maximum="1.0" Value="1.0" 
+                                   TickFrequency="0.1" IsSnapToTickEnabled="True"/>
+                            
+                            <TextBlock Text="UI SCALE" Foreground="White" FontWeight="Bold" Margin="0,15,0,5"/>
+                            <Slider x:Name="UIScaleSlider" Minimum="0.5" Maximum="2.0" Value="1.0" 
+                                   TickFrequency="0.1" IsSnapToTickEnabled="True"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Panel Toggles -->
+                    <Border Grid.Column="1" Style="{StaticResource OverlayPanel}">
+                        <StackPanel>
+                            <TextBlock Text="👁️ PANEL VISIBILITY" FontSize="16" FontWeight="Bold" 
+                                     Foreground="#FFFF6600" Margin="0,0,0,15"/>
+                            
+                            <CheckBox Content="🏎️ Core Driving Info" Foreground="White" FontWeight="Bold" IsChecked="True" Margin="0,0,0,5"/>
+                            <CheckBox Content="🛞 Car Condition" Foreground="White" FontWeight="Bold" IsChecked="True" Margin="0,0,0,5"/>
+                            <CheckBox Content="🏁 Race Awareness" Foreground="White" FontWeight="Bold" IsChecked="True" Margin="0,0,0,5"/>
+                            <CheckBox Content="🧠 Strategy Tools" Foreground="White" FontWeight="Bold" IsChecked="True" Margin="0,0,0,5"/>
+                            <CheckBox Content="📊 Telemetry & Training" Foreground="White" FontWeight="Bold" IsChecked="True" Margin="0,0,0,5"/>
+                            <CheckBox Content="🗺️ Track Maps" Foreground="White" FontWeight="Bold" IsChecked="False" Margin="0,0,0,5"/>
+                            
+                            <TextBlock Text="LAYOUT PRESETS" Foreground="White" FontWeight="Bold" Margin="0,20,0,10"/>
+                            <Button Content="PRACTICE LAYOUT" Style="{StaticResource ModernButton}" Margin="0,0,0,5"/>
+                            <Button Content="QUALIFYING LAYOUT" Style="{StaticResource ModernButton}" Margin="0,0,0,5"/>
+                            <Button Content="RACE LAYOUT" Style="{StaticResource ModernButton}" Margin="0,0,0,5"/>
+                            <Button Content="ENDURANCE LAYOUT" Style="{StaticResource ModernButton}" Margin="0,0,0,5"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </ScrollViewer>
+        </Grid>
+
+        <!-- Enhanced Status Bar -->
+        <Border Grid.Row="3" BorderBrush="#FFFF6600" BorderThickness="0,2,0,0">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Color="#FF2A2A2A" Offset="0"/>
+                    <GradientStop Color="#FF1A1A1A" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.Background>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="25,0">
+                    <Ellipse Width="8" Height="8" Fill="#FF00FF66" Margin="0,0,10,0"/>
+                    <TextBlock x:Name="StatusText" Text="Ready - Connect to iRacing to begin" 
+                             Foreground="White" FontWeight="Bold" VerticalAlignment="Center"/>
+                </StackPanel>
+                
+                <Border Grid.Column="1" Background="#FF2A2A2A" CornerRadius="4" Padding="10,5" Margin="10,0">
+                    <TextBlock x:Name="LastLapTimeText" Text="Last Lap: --:--" 
+                             Foreground="#FFFF6600" FontWeight="Bold" FontSize="12"/>
+                </Border>
+
+                <Border Grid.Column="2" Background="#FF2A2A2A" CornerRadius="4" Padding="10,5" Margin="10,0">
+                    <TextBlock x:Name="CurrentModeText" Text="CONFIG MODE" 
+                             Foreground="#FF00FF66" FontWeight="Bold" FontSize="12"/>
+                </Border>
+                
+                <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center" Margin="25,0">
+                    <TextBlock Text="ShearerPNW iRacing Overlay System v3.0" 
+                             Foreground="#FFAAAAAA" FontSize="12" FontWeight="Bold"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
