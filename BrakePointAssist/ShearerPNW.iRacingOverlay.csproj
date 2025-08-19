@@ -1,0 +1,55 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <AssemblyTitle>ShearerPNW iRacing Professional Overlay System</AssemblyTitle>
+    <AssemblyDescription>Professional iRacing overlay with brake points, telemetry, race awareness, and strategy tools</AssemblyDescription>
+    <AssemblyCompany>ShearerPNW</AssemblyCompany>
+    <AssemblyProduct>iRacing Professional Overlay</AssemblyProduct>
+    <AssemblyCopyright>Copyright © ShearerPNW 2025</AssemblyCopyright>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
+    
+    <!-- Self-contained deployment settings -->
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <PublishTrimmed>false</PublishTrimmed>
+    <UseAppHost>true</UseAppHost>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Audio library for brake point alerts -->
+    <PackageReference Include="NAudio" Version="2.2.1" />
+    
+    <!-- iRacing SDK -->
+    <PackageReference Include="irsdkSharp" Version="0.9.0" />
+    
+    <!-- JSON handling -->
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    
+    <!-- Plugin system -->
+    <PackageReference Include="System.ComponentModel.Composition" Version="8.0.0" />
+  </ItemGroup>
+
+  <!-- Organize files into logical folders -->
+  <ItemGroup>
+    <Folder Include="Core\" />
+    <Folder Include="Overlays\" />
+    <Folder Include="Overlays\DrivingInfo\" />
+    <Folder Include="Overlays\CarCondition\" />
+    <Folder Include="Overlays\RaceAwareness\" />
+    <Folder Include="Overlays\Strategy\" />
+    <Folder Include="Overlays\Telemetry\" />
+    <Folder Include="UI\" />
+    <Folder Include="UI\Components\" />
+    <Folder Include="Data\" />
+    <Folder Include="Data\Tracks\" />
+    <Folder Include="Data\Config\" />
+  </ItemGroup>
+
+</Project>
