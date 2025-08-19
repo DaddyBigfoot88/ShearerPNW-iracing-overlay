@@ -1,0 +1,108 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <AssemblyTitle>ShearerPNW iRacing Overlay System</AssemblyTitle>
+    <AssemblyDescription>Professional iRacing overlay with brake point training, lap tracking, tire management, fuel strategy, and race awareness</AssemblyDescription>
+    <AssemblyCompany>ShearerPNW</AssemblyCompany>
+    <AssemblyProduct>iRacing Overlay System</AssemblyProduct>
+    <AssemblyCopyright>Copyright © ShearerPNW 2025</AssemblyCopyright>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
+    <AssemblyVersion>3.0.0.0</AssemblyVersion>
+    <FileVersion>3.0.0.0</FileVersion>
+    
+    <!-- Enhanced deployment settings -->
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <PublishTrimmed>false</PublishTrimmed>
+    <UseAppHost>true</UseAppHost>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    
+    <!-- Performance and compatibility -->
+    <TieredCompilation>true</TieredCompilation>
+    <TieredCompilationQuickJit>true</TieredCompilationQuickJit>
+    <ServerGarbageCollection>false</ServerGarbageCollection>
+    <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <Optimize>true</Optimize>
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+    <DefineConstants>RELEASE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <Optimize>false</Optimize>
+    <DebugType>full</DebugType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Core audio library for brake point alerts and system sounds -->
+    <PackageReference Include="NAudio" Version="2.2.1" />
+    
+    <!-- iRacing SDK - using the correct available version -->
+    <PackageReference Include="irsdkSharp" Version="0.9.0" />
+    
+    <!-- JSON serialization for enhanced configuration and data management -->
+    <PackageReference Include="System.Text.Json" Version="8.0.0" />
+    
+    <!-- Enhanced file operations and compression -->
+    <PackageReference Include="System.IO.Compression" Version="4.3.0" />
+    
+    <!-- Performance monitoring and diagnostics -->
+    <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="8.0.0" />
+    
+    <!-- Threading and async operations -->
+    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Application resources -->
+    <Resource Include="icon.ico" />
+    <Content Include="README.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="CHANGELOG.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Ensure data directories exist -->
+    <None Include="OverlayData\.gitkeep">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Layouts\.gitkeep">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <!-- Post-build tasks for release -->
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)'=='Release'">
+    <Exec Command="echo Building ShearerPNW iRacing Overlay System v3.0..." />
+    <Exec Command="if not exist &quot;$(TargetDir)OverlayData&quot; mkdir &quot;$(TargetDir)OverlayData&quot;" />
+    <Exec Command="if not exist &quot;$(TargetDir)Layouts&quot; mkdir &quot;$(TargetDir)Layouts&quot;" />
+    <Exec Command="echo Build complete. Ready for deployment." />
+  </Target>
+
+  <!-- Publish profiles for different deployment scenarios -->
+  <PropertyGroup Condition="'$(PublishProfile)'=='Production'">
+    <PublishUrl>./Release/</PublishUrl>
+    <PublishProtocol>FileSystem</PublishProtocol>
+    <_TargetId>Folder</_TargetId>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <PublishSingleFile>true</PublishSingleFile>
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <PublishTrimmed>false</PublishTrimmed>
+  </PropertyGroup>
+
+</Project>
