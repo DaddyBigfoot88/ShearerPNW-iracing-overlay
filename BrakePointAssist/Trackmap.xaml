@@ -637,12 +637,12 @@
                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Grid>
 
-            <!-- About Tab Content -->
-            <Grid x:Name="AboutTabContent" Visibility="Collapsed">
-                <TextBlock Text="ℹ️ About & Help Coming Soon!" 
-                         FontSize="24" Foreground="#FFAAAAAA" 
-                         HorizontalAlignment="Center" VerticalAlignment="Center"/>
-            </Grid>
+<!-- About Tab Content -->
+<Grid x:Name="AboutTabContent" Visibility="Collapsed">
+    <TextBlock Text="ℹ️ About &amp; Help Coming Soon!"
+               FontSize="24" Foreground="#FFAAAAAA"
+               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+</Grid>
         </Grid>
 
         <!-- Enhanced Status Bar -->
